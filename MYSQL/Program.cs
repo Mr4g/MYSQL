@@ -6,10 +6,13 @@ using System.Windows.Forms;
 using S7.Net;
 using Opc.Ua;
 using Opc.Ua.Configuration;
+using MySql.Data.MySqlClient;
+using Opc.Ua.Client;
+using System.Threading;
 
 namespace MYSQL
 {
-    internal static class Program
+    class Program
     {
 
         /// <summary>
@@ -17,15 +20,29 @@ namespace MYSQL
         /// </summary>
         [STAThread]
 
-            static void Main()
+        public static void Main()
+        {
             {
-                
+                Thread thread = new Thread(DoSomething);
+                thread.Start();
+
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new IoT());
 
+                Application.Run(new IoT());
               
 
             }
+
+        }
+
+        public static void DoSomething()
+        {
+            // Kod, który ma być wykonany w innym wątku
+
+            MySQL mySQL = new MySQL();
+            mySQL.MySQLWrite();
+        }
     }
+
 }

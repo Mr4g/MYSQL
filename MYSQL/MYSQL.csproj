@@ -255,6 +255,8 @@
       <DependentUpon>IoT.cs</DependentUpon>
       <Link>IoT.Designer.cs</Link>
     </Compile>
+    <Compile Include="MySQL.cs" />
+    <Compile Include="OPCClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="..\..\backup\IoT.resx">
@@ -329,6 +331,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Reload-0.5s-194px %281%29.gif" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="ConsoleReferenceClient.Config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

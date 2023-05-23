@@ -143,6 +143,16 @@ namespace MYSQL.Properties {
         /// <summary>
         ///   Wyszukuje zlokalizowany zasób typu System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap image_removebg_preview__6_ {
+            get {
+                object obj = ResourceManager.GetObject("image-removebg-preview (6)", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Wyszukuje zlokalizowany zasób typu System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap machine {
             get {
                 object obj = ResourceManager.GetObject("machine", resourceCulture);

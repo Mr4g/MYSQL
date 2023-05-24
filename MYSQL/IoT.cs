@@ -15,23 +15,31 @@ using CefSharp.WinForms;
 using System.Diagnostics;
 using System.Threading;
 using System.Runtime.InteropServices;
+using MYSQL;
+
 
 
 namespace MYSQL
 {
     public partial class IoT : Form
     {
-
+        
         public IoT()
-        { 
+        {
+
+            InitializeComponent();
+            IsMdiContainer = true;
+            TableDataLoad();
+            timer1.Start();
             
-            InitializeComponent(); 
-        
-        
+
         }
 
 
         public ChromiumWebBrowser browser;
+        public statusDataBaseForm newStatusDataBaseForm;
+
+  
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -57,50 +65,16 @@ namespace MYSQL
 
         private void button2_Click(object sender, EventArgs e)
         {
-            using (var plc = new Plc(CpuType.S71200, "192.168.0.2", 0, 1))
-            {
-                plc.Open();
 
-                bool db1Bool1 = (bool)plc.Read("DB1.DBX0.0");
-                Console.WriteLine("DB1.DBX0.0: " + db1Bool1);
-
-
-                bool db1Bool2 = (bool)plc.Read("DB1.DBX0.1");
-                Console.WriteLine("DB1.DBX0.1: " + db1Bool2);
-
-                var db1IntVariable = (ushort)plc.Read("DB1.DBW2.0");
-                Console.WriteLine("DB1.DBW2.0: " + db1IntVariable);
-
-                var db1RealVariable = ((uint)plc.Read("DB1.DBD4.0")).ConvertToFloat();
-                Console.WriteLine("DB1.DBD4.0: " + db1RealVariable);
-
-
-                var db1DintVariable = (uint)plc.Read("DB1.DBD8.0");
-                Console.WriteLine("DB1.DBD8.0: " + db1DintVariable);
-
-                var db1DwordVariable = (uint)plc.Read("DB1.DBD12.0");
-                Console.WriteLine("DB1.DBD12.0: " + db1DwordVariable);
-
-                var db1WordVariable = (ushort)plc.Read("DB1.DBW16.0");
-                Console.WriteLine("DB1.DBD16.0: " + db1WordVariable);
-
-
-
-                string connstring = "server=localhost;uid=root;pwd=Root;database=test";
-                MySqlConnection con = new MySqlConnection();
-                con.ConnectionString = connstring;
-                con.Open();
-                string query = "insert into test(Kolumna_1,Kolumna_2) values(" + db1IntVariable + ",18)";
-                MySqlCommand cmd = new MySqlCommand(query, con);
-                cmd.ExecuteNonQuery();
-
-            }
         }
 
         private void chromiumHostControl1_Click(object sender, EventArgs e)
         {
 
         }
+
+ 
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -119,6 +93,14 @@ namespace MYSQL
 
         private void splunk_Click(object sender, EventArgs e)
         {
+
+            // zamknięcie DataBase jeśli jest otwarta
+            if (newStatusDataBaseForm != null)
+            {
+                newStatusDataBaseForm.Close();
+                newStatusDataBaseForm = null;
+            }
+            webWindow.Visible = true;
             string newUrl = "https://splunk05w05.viessmann.net:8000/en-GB/app/VI_W16/w16heliumtester1odu_kpi";
 
             if (browser == null)
@@ -131,45 +113,71 @@ namespace MYSQL
             {
                 browser.Load(newUrl);
                 conectiongif.Visible = true;
+                statusMachine.Visible = false;
             }
         }
 
         private void machine_Click(object sender, EventArgs e)
         {
 
+            statusMachine.Visible = true;
+
+            if (machine == null)
+            {
+
+                statusMachine.Visible = false;
+            }
+            else
+            {
+                statusMachine.Visible = true;
+            }
         }
 
 
         private void conectiongif_Click(object sender, EventArgs e)
         {
-            
+
         }
 
 
 
-        private void sap_Click(object sender, EventArgs e)
+        public void sap_Click(object sender, EventArgs e)
         {
+
+            webWindow.Visible = true;
+
+
+            if (newStatusDataBaseForm != null)
             {
-                string newUrl = "https://me.sap.com/";
+                newStatusDataBaseForm.Close();
+                newStatusDataBaseForm = null;
+            }
+
+
+
+            {
+                string newUrl = "http://otw0039w05.viessmann.iotdmz:51300/manufacturing";
 
                 if (browser == null)
                 {
                     browser = new ChromiumWebBrowser(newUrl);
                     webWindow.Controls.Add(browser);
                     conectiongif.Visible = true;
+                    webWindow.Visible = true;
+                    statusMachine.Visible = false;
 
                 }
                 else
                 {
                     browser.Load(newUrl);
                     conectiongif.Visible = true;
+                    statusMachine.Visible = false;
 
 
                 }
             }
         }
 
-     
 
         private void label1_Click(object sender, EventArgs e)
         {
@@ -186,7 +194,7 @@ namespace MYSQL
 
         }
 
-        [DllImport("user32.dll")]   
+        [DllImport("user32.dll")]
         static extern IntPtr SetParent(IntPtr hwc, IntPtr hwp);
         private void sapApp_Click(object sender, EventArgs e)
         {
@@ -202,9 +210,256 @@ namespace MYSQL
 
         }
 
+
+        private void ShowMessageBox(string message)
+        {
+            MessageBox.Show(message);
+        }
+
         private void webWindow_Paint(object sender, PaintEventArgs e)
         {
 
         }
-    }
+
+        private void pictureBox4_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void statusMachine_Paint(object sender, PaintEventArgs e)
+        {
+
+        }
+
+        private void Downtime_Click(object sender, EventArgs e)
+        {
+            string connstring = "server=localhost;uid=root;pwd=Root;database=test";
+            MySqlConnection con = new MySqlConnection(connstring);
+            con.Open();
+
+            string selectCountQuery = "SELECT COUNT(*) FROM hmi";
+            MySqlCommand selectCountCmd = new MySqlCommand(selectCountQuery, con);
+            int rowCount = Convert.ToInt32(selectCountCmd.ExecuteScalar());
+
+            if (rowCount > 0)
+            {
+
+                bool valueToInsert = buttonState;
+                // Nadpisz wartość 1 we wszystkich kolumnach w pierwszym wierszu
+                string updateQuery = "UPDATE hmi SET DownTime = " + (valueToInsert ? "1" : "0") + " LIMIT 1";
+                MySqlCommand updateCmd = new MySqlCommand(updateQuery, con);
+                updateCmd.ExecuteNonQuery();
+                buttonState = !buttonState;
+
+
+            }
+            con.Close();
+        }
+
+        public void DataBase_Click(object sender, EventArgs e)
+        {
+            newStatusDataBaseForm = new statusDataBaseForm();
+            newStatusDataBaseForm.Show();
+            newStatusDataBaseForm.MdiParent = this; // Ustawienie głównego okna jako rodzica MDI
+            newStatusDataBaseForm.BringToFront(); // Przesunięcie okna na wierzch
+            statusMachine.Visible = false;
+            webWindow.Visible = false;
+
+        }
+
+        private void panel2_Paint(object sender, PaintEventArgs e)
+        {
+
+
+
+        }
+
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
+        }
+
+        public virtual void RefreshDataSource()
+        {
+            TableDataLoad();
+        }
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            RefreshDataSource();
+        }
+
+
+
+        void TableDataLoad()
+        {
+
+
+
+            string connstring = "server=localhost;uid=root;pwd=Root;database=test";
+            MySqlConnection con = new MySqlConnection(connstring);
+            con.Open();
+
+
+
+            // Pobierz dane i ustaw źródło danych w DataGridView
+            string selectQuery = "SELECT DownTime, Setup, Maintenance, Personel, OthersLogistic, NOK FROM hmi";
+            MySqlCommand selectCmd = new MySqlCommand(selectQuery, con);
+            MySqlDataAdapter adapter = new MySqlDataAdapter(selectCmd);
+            DataTable dataTable = new DataTable();
+            adapter.Fill(dataTable);
+            dataGridView1.DataSource = dataTable;
+
+            con.Close();
+
+        }
+
+        private void Mintenance_Click(object sender, EventArgs e)
+        {
+
+        }
+        private bool buttonState = false;
+        public void Setup_Click(object sender, EventArgs e)
+        {
+            string connstring = "server=localhost;uid=root;pwd=Root;database=test";
+            MySqlConnection con = new MySqlConnection(connstring);
+            con.Open();
+
+            string selectCountQuery = "SELECT COUNT(*) FROM hmi";
+            MySqlCommand selectCountCmd = new MySqlCommand(selectCountQuery, con);
+            int rowCount = Convert.ToInt32(selectCountCmd.ExecuteScalar());
+
+            if (rowCount > 0)
+            {
+
+                bool valueToInsert = buttonState;
+                // Nadpisz wartość 1 we wszystkich kolumnach w pierwszym wierszu
+                string updateQuery = "UPDATE hmi SET Setup = " + (valueToInsert ? "1" : "0") + " LIMIT 1";
+                MySqlCommand updateCmd = new MySqlCommand(updateQuery, con);
+                updateCmd.ExecuteNonQuery();
+                buttonState = !buttonState;
+
+
+            }
+            con.Close();
+        }
+        private void NOK_Click(object sender, EventArgs e)
+        {
+
+            string connstring = "server=localhost;uid=root;pwd=Root;database=test";
+            MySqlConnection con = new MySqlConnection(connstring);
+            con.Open();
+
+            string selectCountQuery = "SELECT COUNT(*) FROM hmi";
+            MySqlCommand selectCountCmd = new MySqlCommand(selectCountQuery, con);
+            int rowCount = Convert.ToInt32(selectCountCmd.ExecuteScalar());
+
+            if (rowCount > 0)
+            {
+
+                bool valueToInsert = buttonState;
+                // Nadpisz wartość 1 we wszystkich kolumnach w pierwszym wierszu
+                string updateQuery = "UPDATE hmi SET NOK = " + (valueToInsert ? "1" : "0") + " LIMIT 1";
+                MySqlCommand updateCmd = new MySqlCommand(updateQuery, con);
+                updateCmd.ExecuteNonQuery();
+                buttonState = !buttonState;
+
+
+            }
+            con.Close();
+
+        }
+
+        private void Maintenance_Click(object sender, EventArgs e)
+        {
+
+            string connstring = "server=localhost;uid=root;pwd=Root;database=test";
+            MySqlConnection con = new MySqlConnection(connstring);
+            con.Open();
+
+            string selectCountQuery = "SELECT COUNT(*) FROM hmi";
+            MySqlCommand selectCountCmd = new MySqlCommand(selectCountQuery, con);
+            int rowCount = Convert.ToInt32(selectCountCmd.ExecuteScalar());
+
+            if (rowCount > 0)
+            {
+
+                bool valueToInsert = buttonState;
+                // Nadpisz wartość 1 we wszystkich kolumnach w pierwszym wierszu
+                string updateQuery = "UPDATE hmi SET Maintenance = " + (valueToInsert ? "1" : "0") + " LIMIT 1";
+                MySqlCommand updateCmd = new MySqlCommand(updateQuery, con);
+                updateCmd.ExecuteNonQuery();
+                buttonState = !buttonState;
+
+
+            }
+            con.Close();
+
+        }
+
+
+        private void OthersLogistic_Click(object sender, EventArgs e)
+        {
+
+            string connstring = "server=localhost;uid=root;pwd=Root;database=test";
+            MySqlConnection con = new MySqlConnection(connstring);
+            con.Open();
+
+            string selectCountQuery = "SELECT COUNT(*) FROM hmi";
+            MySqlCommand selectCountCmd = new MySqlCommand(selectCountQuery, con);
+            int rowCount = Convert.ToInt32(selectCountCmd.ExecuteScalar());
+
+            if (rowCount > 0)
+            {
+
+                bool valueToInsert = buttonState;
+                // Nadpisz wartość 1 we wszystkich kolumnach w pierwszym wierszu
+                string updateQuery = "UPDATE hmi SET OthersLogistic = " + (valueToInsert ? "1" : "0") + " LIMIT 1";
+                MySqlCommand updateCmd = new MySqlCommand(updateQuery, con);
+                updateCmd.ExecuteNonQuery();
+                buttonState = !buttonState;
+
+
+            }
+            con.Close();
+
+        }
+
+        private void Personel_Click(object sender, EventArgs e)
+        {
+            string connstring = "server=localhost;uid=root;pwd=Root;database=test";
+            MySqlConnection con = new MySqlConnection(connstring);
+            con.Open();
+
+            string selectCountQuery = "SELECT COUNT(*) FROM hmi";
+            MySqlCommand selectCountCmd = new MySqlCommand(selectCountQuery, con);
+            int rowCount = Convert.ToInt32(selectCountCmd.ExecuteScalar());
+
+            if (rowCount > 0)
+            {
+
+                bool valueToInsert = buttonState;
+                // Nadpisz wartość 1 we wszystkich kolumnach w pierwszym wierszu
+                string updateQuery = "UPDATE hmi SET Personel = " + (valueToInsert ? "1" : "0") + " LIMIT 1";
+                MySqlCommand updateCmd = new MySqlCommand(updateQuery, con);
+                updateCmd.ExecuteNonQuery();
+                buttonState = !buttonState;
+
+
+            }
+            con.Close();
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+
+    } 
 }
+

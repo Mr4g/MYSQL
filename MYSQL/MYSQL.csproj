@@ -247,9 +247,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\backup\IoT.cs">
+    <Compile Include="IoT.cs">
       <SubType>Form</SubType>
-      <Link>IoT.cs</Link>
     </Compile>
     <Compile Include="IoT.Designer.cs">
       <DependentUpon>IoT.cs</DependentUpon>

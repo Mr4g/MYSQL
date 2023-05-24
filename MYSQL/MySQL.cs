@@ -4,11 +4,13 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Management;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using S7.Net;
+using S7.Net.Types;
 
 
 namespace MYSQL
@@ -16,7 +18,7 @@ namespace MYSQL
     class MySQL
     {
 
-        public void MySQLWrite()
+        public string MySQLWrite()
         {
             OPCClient Client = new OPCClient();
             Client.OPCClient1();
@@ -24,11 +26,14 @@ namespace MYSQL
             while (true)
             {
 
-                using (var plc = new Plc(CpuType.S71200, "192.168.0.1", 0, 2))
+                using (var plc = new Plc(CpuType.S71200, "127.0.0.1", 0, 1))
+
+
                 {
                     try
                     {
                         plc.Open();
+
 
                         for (int i = 1; i <= 3; i++)
                         {
@@ -91,22 +96,23 @@ namespace MYSQL
                             }
 
                             con.Close();
+                            return "PLC connection successful.";
                         }
-                    
-                    
+
+
                     }
-                        
+
                     catch (PlcException ex)
                     {
-                        Console.WriteLine("Failed to establish connection to the PLC. Error message: " + ex.Message);
+                        return "Failed to establish connection to the PLC. Error message: " + ex.Message;
                     }
                 }
             }
         }
-                    
-                
-    } 
-} 
- 
-       
-   
+
+
+    }
+}
+
+
+

@@ -251,9 +251,8 @@
       <SubType>Form</SubType>
       <Link>IoT.cs</Link>
     </Compile>
-    <Compile Include="..\..\backup\IoT.Designer.cs">
+    <Compile Include="IoT.Designer.cs">
       <DependentUpon>IoT.cs</DependentUpon>
-      <Link>IoT.Designer.cs</Link>
     </Compile>
     <Compile Include="statusDataBaseForm.cs">
       <SubType>Form</SubType>
@@ -265,9 +264,8 @@
     <Compile Include="OPCClient.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="..\..\backup\IoT.resx">
+    <EmbeddedResource Include="IoT.resx">
       <DependentUpon>IoT.cs</DependentUpon>
-      <Link>IoT.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
